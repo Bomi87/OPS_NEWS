@@ -423,25 +423,25 @@
     <div class="header">
       <div class="header-top">
         <div class="title-wrap">
-          <h1>OPSGROUP 뉴스</h1>
-          <p>Today / day ago / days ago 기준으로 OPSGROUP 뉴스를 분류해서 표시</p>
+          <h1>OPSGROUP News</h1>
+          <p>Display OPSGROUP news grouped by Today, day ago, and days ago.</p>
         </div>
 
         <div class="button-row">
           <button class="btn-primary" id="btnUpdate" onclick="updateNews()">
-            OPSGROUP 최신 업데이트
+            News Update
           </button>
         </div>
       </div>
 
       <div class="status-row">
-        <div class="status" id="statusText">저장된 뉴스 자동 불러오는 중...</div>
+        <div class="status" id="statusText">Loading...</div>
 
         <div class="search-box">
           <input
             id="searchInput"
             type="text"
-            placeholder="공항코드, 국가, 키워드 검색..."
+            placeholder="ICAO, Country, Keyword..."
             oninput="renderNews()"
           />
         </div>
@@ -452,7 +452,7 @@
 
     <div class="loading" id="loadingBox">
       <div class="spinner"></div>
-      <div>불러오는 중...</div>
+      <div>Loading...</div>
     </div>
 
     <div class="summary">
