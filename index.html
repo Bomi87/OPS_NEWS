@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>OPSGROUP News</title>
+  <title>OPSGROUP 뉴스</title>
 
   <style>
     :root {
@@ -68,6 +68,7 @@
       margin: 6px 0 0;
       color: var(--muted);
       font-size: 14px;
+      line-height: 1.45;
     }
 
     .button-row {
@@ -95,15 +96,6 @@
 
     .btn-primary:hover {
       background: var(--blue-dark);
-    }
-
-    .btn-secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    .btn-secondary:hover {
-      background: #d1d5db;
     }
 
     button:disabled {
@@ -148,26 +140,28 @@
     .summary {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
+      gap: 8px;
       margin-bottom: 16px;
     }
 
     .summary-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 10px 8px;
       box-shadow: var(--shadow);
+      min-height: 74px;
     }
 
     .summary-card .label {
-      font-size: 13px;
+      font-size: 12px;
       color: var(--muted);
       margin-bottom: 6px;
+      white-space: nowrap;
     }
 
     .summary-card .count {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
     }
 
@@ -295,7 +289,7 @@
       gap: 8px;
       color: var(--muted);
       font-size: 14px;
-      padding: 20px;
+      padding: 14px;
     }
 
     .spinner {
@@ -314,7 +308,10 @@
     }
 
     @media (max-width: 980px) {
-      .summary,
+      .summary {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
       .news-grid {
         grid-template-columns: 1fr;
       }
@@ -325,6 +322,7 @@
 
       .button-row {
         justify-content: flex-start;
+        width: 100%;
       }
 
       .search-box {
@@ -338,25 +336,79 @@
         padding: 12px;
       }
 
+      .header {
+        padding: 16px;
+        border-radius: 16px;
+      }
+
       .title-wrap h1 {
         font-size: 21px;
       }
 
-      .header {
-        padding: 14px;
-        border-radius: 16px;
-      }
-
-      button {
-        width: 100%;
+      .title-wrap p {
+        font-size: 14px;
       }
 
       .button-row {
         width: 100%;
       }
 
+      button {
+        width: 100%;
+        padding: 12px 13px;
+        font-size: 14px;
+      }
+
+      .status-row {
+        margin-top: 14px;
+      }
+
+      .status {
+        width: 100%;
+        font-size: 13px;
+      }
+
+      .search-box {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .summary {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+        margin-bottom: 14px;
+      }
+
+      .summary-card {
+        padding: 9px 6px;
+        min-height: 66px;
+        border-radius: 13px;
+      }
+
+      .summary-card .label {
+        font-size: 11px;
+        margin-bottom: 4px;
+      }
+
+      .summary-card .count {
+        font-size: 21px;
+      }
+
+      .column {
+        border-radius: 16px;
+      }
+
+      .column-header {
+        padding: 13px;
+        font-size: 17px;
+      }
+
       .article {
         padding: 11px;
+      }
+
+      .airport {
+        font-size: 15px;
       }
 
       .content {
@@ -371,14 +423,11 @@
     <div class="header">
       <div class="header-top">
         <div class="title-wrap">
-          <h1>OPSGROUP News</h1>
+          <h1>OPSGROUP 뉴스</h1>
           <p>Today / day ago / days ago 기준으로 OPSGROUP 뉴스를 분류해서 표시</p>
         </div>
 
         <div class="button-row">
-          <button class="btn-secondary" id="btnLoad" onclick="loadNews()">
-            저장된 뉴스 불러오기
-          </button>
           <button class="btn-primary" id="btnUpdate" onclick="updateNews()">
             OPSGROUP 최신 업데이트
           </button>
@@ -386,7 +435,7 @@
       </div>
 
       <div class="status-row">
-        <div class="status" id="statusText">대기 중</div>
+        <div class="status" id="statusText">저장된 뉴스 자동 불러오는 중...</div>
 
         <div class="search-box">
           <input
@@ -408,32 +457,34 @@
 
     <div class="summary">
       <div class="summary-card">
-        <div class="label">Today</div>
+        <div class="label">오늘</div>
         <div class="count" id="todayCount">0</div>
       </div>
+
       <div class="summary-card">
-        <div class="label">day ago</div>
+        <div class="label">하루 전</div>
         <div class="count" id="dayAgoCount">0</div>
       </div>
+
       <div class="summary-card">
-        <div class="label">days ago</div>
+        <div class="label">며칠 전</div>
         <div class="count" id="daysAgoCount">0</div>
       </div>
     </div>
 
     <div class="news-grid">
       <section class="column">
-        <div class="column-header today">Today</div>
+        <div class="column-header today">오늘</div>
         <div class="article-list" id="todayList"></div>
       </section>
 
       <section class="column">
-        <div class="column-header dayago">day ago</div>
+        <div class="column-header dayago">하루 전</div>
         <div class="article-list" id="dayAgoList"></div>
       </section>
 
       <section class="column">
-        <div class="column-header daysago">days ago</div>
+        <div class="column-header daysago">며칠 전</div>
         <div class="article-list" id="daysAgoList"></div>
       </section>
     </div>
@@ -441,7 +492,8 @@
 
   <script>
     /****************************************************
-     * 여기에 Apps Script Web App URL 입력
+     * Apps Script Web App URL
+     * 반드시 /exec 로 끝나는 배포 URL 입력
      ****************************************************/
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzPtSZSXZx5Gvlp9mrmUWDE6hqMeNVS_-PRkuGWDePvNwJNE7B9Y0sdkXTfrioflFJ/exec";
 
@@ -453,7 +505,6 @@
 
     function setLoading(isLoading) {
       document.getElementById("loadingBox").style.display = isLoading ? "flex" : "none";
-      document.getElementById("btnLoad").disabled = isLoading;
       document.getElementById("btnUpdate").disabled = isLoading;
     }
 
@@ -499,7 +550,7 @@
       try {
         showError("");
         setLoading(true);
-        setStatus("저장된 뉴스 불러오는 중...");
+        setStatus("저장된 뉴스 자동 불러오는 중...");
 
         const result = await callApi("news");
 
@@ -534,7 +585,12 @@
           ? formatDateTime(result.updatedAt)
           : "";
 
-        setStatus("최신 뉴스 업데이트 완료 / 총 " + allNews.length + "건" + (updatedAt ? " / " + updatedAt : ""));
+        setStatus(
+          "최신 뉴스 업데이트 완료 / 총 " +
+          allNews.length +
+          "건" +
+          (updatedAt ? " / " + updatedAt : "")
+        );
       } catch (err) {
         showError(String(err));
         setStatus("업데이트 실패");
