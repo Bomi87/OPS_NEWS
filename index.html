@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,7 +30,7 @@
 
     body {
       margin: 0;
-      font-family: Arial, "Noto Sans KR", sans-serif;
+      font-family: Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
     }
@@ -429,19 +429,19 @@
 
         <div class="button-row">
           <button class="btn-primary" id="btnUpdate" onclick="updateNews()">
-            News Update
+            Update Latest News
           </button>
         </div>
       </div>
 
       <div class="status-row">
-        <div class="status" id="statusText">Loading...</div>
+        <div class="status" id="statusText">Automatically loading saved news...</div>
 
         <div class="search-box">
           <input
             id="searchInput"
             type="text"
-            placeholder="ICAO, Country, Keyword..."
+            placeholder="ICAO, country, keyword..."
             oninput="renderNews()"
           />
         </div>
@@ -457,44 +457,40 @@
 
     <div class="summary">
       <div class="summary-card">
-        <div class="label">오늘</div>
+        <div class="label">Today</div>
         <div class="count" id="todayCount">0</div>
       </div>
 
       <div class="summary-card">
-        <div class="label">하루 전</div>
+        <div class="label">Day Ago</div>
         <div class="count" id="dayAgoCount">0</div>
       </div>
 
       <div class="summary-card">
-        <div class="label">며칠 전</div>
+        <div class="label">Days Ago</div>
         <div class="count" id="daysAgoCount">0</div>
       </div>
     </div>
 
     <div class="news-grid">
       <section class="column">
-        <div class="column-header today">오늘</div>
+        <div class="column-header today">Today</div>
         <div class="article-list" id="todayList"></div>
       </section>
 
       <section class="column">
-        <div class="column-header dayago">하루 전</div>
+        <div class="column-header dayago">Day Ago</div>
         <div class="article-list" id="dayAgoList"></div>
       </section>
 
       <section class="column">
-        <div class="column-header daysago">며칠 전</div>
+        <div class="column-header daysago">Days Ago</div>
         <div class="article-list" id="daysAgoList"></div>
       </section>
     </div>
   </div>
 
   <script>
-    /****************************************************
-     * Apps Script Web App URL
-     * 반드시 /exec 로 끝나는 배포 URL 입력
-     ****************************************************/
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzPtSZSXZx5Gvlp9mrmUWDE6hqMeNVS_-PRkuGWDePvNwJNE7B9Y0sdkXTfrioflFJ/exec";
 
     let allNews = [];
@@ -550,50 +546,50 @@
       try {
         showError("");
         setLoading(true);
-        setStatus("Loading...");
+        setStatus("Automatically loading saved news...");
 
         const result = await callApi("news");
 
         allNews = normalizeNews(result.data || []);
         renderNews();
 
-        setStatus("Loading completed / Total " + allNews.length);
+        setStatus("Saved news loaded / Total " + allNews.length + " items");
       } catch (err) {
         showError(String(err));
-        setStatus("Loading Failed");
+        setStatus("Failed to load news");
       } finally {
         setLoading(false);
       }
     }
 
-   async function updateNews() {
-  try {
-    showError("");
-    setLoading(true);
-    setStatus("Updating the latest OPSGROUP news...");
+    async function updateNews() {
+      try {
+        showError("");
+        setLoading(true);
+        setStatus("Updating the latest OPSGROUP news...");
 
-    const result = await callApi("update");
+        const result = await callApi("update");
 
-    allNews = normalizeNews(result.data || []);
-    renderNews();
+        allNews = normalizeNews(result.data || []);
+        renderNews();
 
-    const updatedAt = result.updatedAt
-      ? formatDateTime(result.updatedAt)
-      : "";
+        const updatedAt = result.updatedAt
+          ? formatDateTime(result.updatedAt)
+          : "";
 
-    setStatus(
-      "Latest news updated / Total " +
-      allNews.length +
-      " items" +
-      (updatedAt ? " / " + updatedAt : "")
-    );
-  } catch (err) {
-    showError(String(err));
-    setStatus("Update failed");
-  } finally {
-    setLoading(false);
-  }
-}
+        setStatus(
+          "Latest news updated / Total " +
+          allNews.length +
+          " items" +
+          (updatedAt ? " / " + updatedAt : "")
+        );
+      } catch (err) {
+        showError(String(err));
+        setStatus("Update failed");
+      } finally {
+        setLoading(false);
+      }
+    }
 
     function normalizeNews(data) {
       return data.map(function (item, index) {
@@ -674,7 +670,7 @@
       const container = document.getElementById(containerId);
 
       if (!items || items.length === 0) {
-        container.innerHTML = '<div class="empty">표시할 뉴스가 없습니다.</div>';
+        container.innerHTML = '<div class="empty">No news to display.</div>';
         return;
       }
 
