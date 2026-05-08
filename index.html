@@ -164,7 +164,18 @@
       box-shadow: var(--shadow);
       min-height: 74px;
     }
+.clickable-summary {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
 
+.clickable-summary:active {
+  transform: scale(0.98);
+}
+
+.clickable-summary:hover {
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+}
     .summary-card .label {
       font-size: 12px;
       color: var(--muted);
@@ -472,38 +483,38 @@
       <div>Loading...</div>
     </div>
 
-    <div class="summary">
-      <div class="summary-card">
-        <div class="label">Today</div>
-        <div class="count" id="todayCount">0</div>
-      </div>
+<div class="summary">
+  <div class="summary-card clickable-summary" onclick="scrollToSection('todaySection')">
+    <div class="label">Today</div>
+    <div class="count" id="todayCount">0</div>
+  </div>
 
-      <div class="summary-card">
-        <div class="label">Day Ago</div>
-        <div class="count" id="dayAgoCount">0</div>
-      </div>
+  <div class="summary-card clickable-summary" onclick="scrollToSection('dayAgoSection')">
+    <div class="label">Day Ago</div>
+    <div class="count" id="dayAgoCount">0</div>
+  </div>
 
-      <div class="summary-card">
-        <div class="label">Days Ago</div>
-        <div class="count" id="daysAgoCount">0</div>
-      </div>
-    </div>
+  <div class="summary-card clickable-summary" onclick="scrollToSection('daysAgoSection')">
+    <div class="label">Days Ago</div>
+    <div class="count" id="daysAgoCount">0</div>
+  </div>
+</div>
 
     <div class="news-grid">
-      <section class="column">
-        <div class="column-header today">Today</div>
-        <div class="article-list" id="todayList"></div>
-      </section>
+<section class="column" id="todaySection">
+  <div class="column-header today">Today</div>
+  <div class="article-list" id="todayList"></div>
+</section>
 
-      <section class="column">
-        <div class="column-header dayago">Day Ago</div>
-        <div class="article-list" id="dayAgoList"></div>
-      </section>
+<section class="column" id="dayAgoSection">
+  <div class="column-header dayago">Day Ago</div>
+  <div class="article-list" id="dayAgoList"></div>
+</section>
 
-      <section class="column">
-        <div class="column-header daysago">Days Ago</div>
-        <div class="article-list" id="daysAgoList"></div>
-      </section>
+<section class="column" id="daysAgoSection">
+  <div class="column-header daysago">Days Ago</div>
+  <div class="article-list" id="daysAgoList"></div>
+</section>
     </div>
   </div>
 
@@ -643,7 +654,15 @@
 
       return "days ago";
     }
+function scrollToSection(sectionId) {
+  const target = document.getElementById(sectionId);
+  if (!target) return;
 
+  target.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
     function renderNews() {
       const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
 
