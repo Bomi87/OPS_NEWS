@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>OPSGROUP 뉴스</title>
+  <title>OPSGROUP News</title>
 
   <style>
     :root {
@@ -550,54 +550,50 @@
       try {
         showError("");
         setLoading(true);
-        setStatus("저장된 뉴스 자동 불러오는 중...");
+        setStatus("Loading...");
 
         const result = await callApi("news");
 
         allNews = normalizeNews(result.data || []);
         renderNews();
 
-        setStatus("저장된 뉴스 로드 완료 / 총 " + allNews.length + "건");
+        setStatus("Loading completed / Total " + allNews.length);
       } catch (err) {
         showError(String(err));
-        setStatus("뉴스 로드 실패");
+        setStatus("Loading Failed");
       } finally {
         setLoading(false);
       }
     }
 
-    async function updateNews() {
-      const ok = confirm("OPSGROUP에 로그인해서 최신 뉴스를 가져올까요?\n\n약간 시간이 걸릴 수 있습니다.");
+   async function updateNews() {
+  try {
+    showError("");
+    setLoading(true);
+    setStatus("Updating the latest OPSGROUP news...");
 
-      if (!ok) return;
+    const result = await callApi("update");
 
-      try {
-        showError("");
-        setLoading(true);
-        setStatus("OPSGROUP 최신 뉴스 업데이트 중...");
+    allNews = normalizeNews(result.data || []);
+    renderNews();
 
-        const result = await callApi("update");
+    const updatedAt = result.updatedAt
+      ? formatDateTime(result.updatedAt)
+      : "";
 
-        allNews = normalizeNews(result.data || []);
-        renderNews();
-
-        const updatedAt = result.updatedAt
-          ? formatDateTime(result.updatedAt)
-          : "";
-
-        setStatus(
-          "최신 뉴스 업데이트 완료 / 총 " +
-          allNews.length +
-          "건" +
-          (updatedAt ? " / " + updatedAt : "")
-        );
-      } catch (err) {
-        showError(String(err));
-        setStatus("업데이트 실패");
-      } finally {
-        setLoading(false);
-      }
-    }
+    setStatus(
+      "Latest news updated / Total " +
+      allNews.length +
+      " items" +
+      (updatedAt ? " / " + updatedAt : "")
+    );
+  } catch (err) {
+    showError(String(err));
+    setStatus("Update failed");
+  } finally {
+    setLoading(false);
+  }
+}
 
     function normalizeNews(data) {
       return data.map(function (item, index) {
