@@ -9,8 +9,8 @@
   <style>
     :root {
       --bg: #f3f4f6;
-      --card: #ffffff;updateNews()
-      --text: #111827;
+   --card: #ffffff;
+--text: #111827;
       --muted: #6b7280;
       --border: #e5e7eb;
       --blue: #2563eb;
@@ -587,56 +587,7 @@
       }
     }
 
-async function updateNews() {
-  try {
-    showError("");
-    setLoading(true);
-    setStatus("Updating the latest OPSGROUP news...");
 
-    const result = await callApi("update");
-
-    allNews = normalizeNews(result.data || []);
-    renderNews();
-
-    const updatedAt = result.updatedAt
-      ? formatDateTime(result.updatedAt)
-      : "";
-
-    // 업데이트 실패 후 저장된 뉴스로 대체된 경우
-    if (result.fallback === true) {
-      setStatus(
-        "Update failed. Showing saved news / Total " +
-        allNews.length +
-        " items" +
-        (updatedAt ? " / " + updatedAt : "")
-      );
-
-      showError(
-        "Latest OPSGROUP update failed, so saved news is displayed.\n\n" +
-        "Source: " + (result.source || "sheet-cache") + "\n" +
-        (result.error || "")
-      );
-
-      return;
-    }
-
-    // 실제 OPSGROUP 업데이트 성공
-    setStatus(
-      "Latest news updated / Total " +
-      allNews.length +
-      " items" +
-      (updatedAt ? " / " + updatedAt : "") +
-      " / Source: " +
-      (result.source || "ops.group")
-    );
-
-  } catch (err) {
-    showError(String(err));
-    setStatus("Update failed");
-  } finally {
-    setLoading(false);
-  }
-}
 
     function normalizeNews(data) {
       return data.map(function (item, index) {
