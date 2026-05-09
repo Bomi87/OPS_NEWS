@@ -457,11 +457,7 @@
   </div>
   <p>Display OPSGROUP news grouped by Today, day ago, and days ago.</p>
 </div>
-        <div class="button-row">
-          <button class="btn-primary" id="btnUpdate" onclick="updateNews()">
-            Update Latest News
-          </button>
-        </div>
+     
       </div>
 
       <div class="status-row">
@@ -521,7 +517,7 @@
   </div>
 
   <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx_I0jbGmt6OpqOWkun5KeQa6vg6cfhythV-5DlDjsVjxx-wueHX3U1Ggg-bSevuvUe/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxv_WPqGk3CmD0wycZlnpT9HZpmXsxrmDWKrlkqDGMP38Kz629rjWfmAictF-LIYmK7/exec";
 
     let allNews = [];
 
@@ -531,7 +527,6 @@
 
     function setLoading(isLoading) {
       document.getElementById("loadingBox").style.display = isLoading ? "flex" : "none";
-      document.getElementById("btnUpdate").disabled = isLoading;
     }
 
     function setStatus(message) {
