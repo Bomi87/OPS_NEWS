@@ -592,34 +592,50 @@
       }
     }
 
-    async function updateNews() {
-      try {
-        showError("");
-        setLoading(true);
-        setStatus("Updating the latest OPSGROUP news...");
+async function updateNews() {
+  try {
+    showError("");
+    setLoading(true);
+    setStatus("Updating the latest OPSGROUP news...");
 
-        const result = await callApi("update");
+    const result = await callApi("update");
 
-        allNews = normalizeNews(result.data || []);
-        renderNews();
+    allNews = normalizeNews(result.data || []);
+    renderNews();
 
-        const updatedAt = result.updatedAt
-          ? formatDateTime(result.updatedAt)
-          : "";
+    const updatedAt = result.updatedAt
+      ? formatDateTime(result.updatedAt)
+      : "";
 
-        setStatus(
-          "Latest news updated / Total " +
-          allNews.length +
-          " items" +
-          (updatedAt ? " / " + updatedAt : "")
-        );
-      } catch (err) {
-        showError(String(err));
-        setStatus("Update failed");
-      } finally {
-        setLoading(false);
-      }
+    if (result.fallback) {
+      setStatus(
+        "Update failed. Showing saved news / Total " +
+        allNews.length +
+        " items" +
+        (updatedAt ? " / " + updatedAt : "")
+      );
+
+      showError(
+        "Latest OPSGROUP update failed, so saved news is displayed.\n\n" +
+        (result.error || "")
+      );
+      return;
     }
+
+    setStatus(
+      "Latest news updated / Total " +
+      allNews.length +
+      " items" +
+      (updatedAt ? " / " + updatedAt : "")
+    );
+
+  } catch (err) {
+    showError(String(err));
+    setStatus("Update failed");
+  } finally {
+    setLoading(false);
+  }
+}
 
     function normalizeNews(data) {
       return data.map(function (item, index) {
