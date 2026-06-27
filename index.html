@@ -447,6 +447,22 @@
 </head>
 
 <body>
+  <div id="authScreen" style="
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:#f3f4f6;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    color:#111827;
+    font-size:15px;
+    font-weight:700;
+  ">
+    승인 확인 중...
+  </div>
+
+  <div id="appRoot" style="display:none;">
   <div class="app">
     <div class="header">
       <div class="header-top">
@@ -515,15 +531,38 @@
 </section>
     </div>
   </div>
+  </div>
 
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY9hnEVsddHPg35w8k1iqvmEZilbzVvKi7eivTb7q2BAVuHg8CwKZX2glk4B8dW7gS/exec";
 
     let allNews = [];
+    let OPSGROUP_NEWS_APP_STARTED = false;
 
-    window.addEventListener("DOMContentLoaded", function () {
+    function showAuthorizedApp() {
+      const authScreen = document.getElementById("authScreen");
+      const appRoot = document.getElementById("appRoot");
+
+      if (authScreen) authScreen.style.display = "none";
+      if (appRoot) appRoot.style.display = "block";
+    }
+
+    function startOpsgroupNewsAfterAuth() {
+      if (OPSGROUP_NEWS_APP_STARTED) return;
+
+      OPSGROUP_NEWS_APP_STARTED = true;
+      showAuthorizedApp();
       loadNews();
-    });
+    }
+
+    (function waitForPortalAuth() {
+      if (window.CURRENT_PORTAL_USER) {
+        startOpsgroupNewsAfterAuth();
+        return;
+      }
+
+      setTimeout(waitForPortalAuth, 200);
+    })();
 
     function setLoading(isLoading) {
       document.getElementById("loadingBox").style.display = isLoading ? "flex" : "none";
@@ -721,5 +760,8 @@ function scrollToSection(sectionId) {
         .replace(/'/g, "&#039;");
     }
   </script>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://bomi87.github.io/SK-Aviation-portal/common-auth.js"></script>
 </body>
 </html>
