@@ -536,6 +536,11 @@
   <script>
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwY9hnEVsddHPg35w8k1iqvmEZilbzVvKi7eivTb7q2BAVuHg8CwKZX2glk4B8dW7gS/exec";
 
+    // 브라우저에 직전 뉴스를 저장해 두었다가 다음 접속 시 즉시 표시합니다.
+    // API는 백그라운드에서 다시 호출하여 최신 뉴스로 교체합니다.
+    const NEWS_CACHE_KEY = "opsgroup_news_cache_v1";
+    const API_TIMEOUT_MS = 15000;
+
     let allNews = [];
     let OPSGROUP_NEWS_APP_STARTED = false;
 
@@ -586,41 +591,127 @@
     }
 
     async function callApi(action) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(function () {
+        controller.abort();
+      }, API_TIMEOUT_MS);
+
+      // 구글/중간 캐시에 예전 응답이 계속 남지 않도록 API 호출은 새로 수행합니다.
+      // 단, 화면에는 localStorage의 직전 뉴스가 먼저 표시됩니다.
       const url = APPS_SCRIPT_URL + "?action=" + encodeURIComponent(action) + "&t=" + Date.now();
 
-      const response = await fetch(url, {
-        method: "GET",
-        cache: "no-store"
-      });
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          cache: "no-store",
+          signal: controller.signal
+        });
 
-      if (!response.ok) {
-        throw new Error("HTTP Error: " + response.status);
+        if (!response.ok) {
+          throw new Error("HTTP Error: " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data.ok) {
+          throw new Error(data.error || "Apps Script error");
+        }
+
+        return data;
+      } catch (err) {
+        if (err && err.name === "AbortError") {
+          throw new Error("News API response timed out after 15 seconds.");
+        }
+        throw err;
+      } finally {
+        clearTimeout(timeoutId);
       }
+    }
 
-      const data = await response.json();
+    function loadNewsCache() {
+      try {
+        const raw = localStorage.getItem(NEWS_CACHE_KEY);
+        if (!raw) return null;
 
-      if (!data.ok) {
-        throw new Error(data.error || "Apps Script error");
+        const cached = JSON.parse(raw);
+        if (!cached || !Array.isArray(cached.data)) return null;
+
+        return {
+          data: cached.data,
+          savedAt: cached.savedAt || 0
+        };
+      } catch (err) {
+        try {
+          localStorage.removeItem(NEWS_CACHE_KEY);
+        } catch (ignore) {}
+        return null;
       }
+    }
 
-      return data;
+    function saveNewsCache(data) {
+      try {
+        localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({
+          savedAt: Date.now(),
+          data: data
+        }));
+        return true;
+      } catch (err) {
+        // 용량 초과, 시크릿 모드 정책 등으로 저장이 안 되어도
+        // 뉴스 로딩 자체는 계속 진행합니다.
+        console.warn("News cache save failed:", err);
+        return false;
+      }
+    }
+
+    function formatCacheTime(timestamp) {
+      if (!timestamp) return "";
+
+      const d = new Date(timestamp);
+      if (isNaN(d.getTime())) return "";
+
+      return String(d.getHours()).padStart(2, "0") + ":" +
+        String(d.getMinutes()).padStart(2, "0");
     }
 
     async function loadNews() {
-      try {
-        showError("");
+      const cached = loadNewsCache();
+      const hasCachedNews = Boolean(cached && cached.data.length);
+
+      if (hasCachedNews) {
+        allNews = normalizeNews(cached.data);
+        renderNews();
+        setLoading(false);
+
+        const cacheTime = formatCacheTime(cached.savedAt);
+        setStatus(
+          "Showing saved news" +
+          (cacheTime ? " (" + cacheTime + ")" : "") +
+          " / Checking for latest news..."
+        );
+      } else {
         setLoading(true);
         setStatus("Automatically loading saved news...");
+      }
+
+      try {
+        showError("");
 
         const result = await callApi("news");
 
         allNews = normalizeNews(result.data || []);
         renderNews();
+        saveNewsCache(allNews);
 
         setStatus("Saved news loaded / Total " + allNews.length + " items");
       } catch (err) {
-        showError(String(err));
-        setStatus("Failed to load news");
+        if (hasCachedNews) {
+          // 이전 뉴스가 있으면 화면은 그대로 유지하고 상태만 알립니다.
+          setStatus("Showing saved news / Latest update delayed");
+          console.warn("Background news update failed:", err);
+        } else {
+          showError(String(err));
+          setStatus("Failed to load news");
+        }
       } finally {
         setLoading(false);
       }
