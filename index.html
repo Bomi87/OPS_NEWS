@@ -822,7 +822,7 @@ function scrollToSection(sectionId) {
             ${item.type ? `<div class="type">${escapeHtml(item.type)}</div>` : ""}
 
             <div class="content">${linkifyContent(item.content || "")}</div>
-            ${safeArticleUrl(item.link) ? `<div style="margin-top:8px"><a href="${escapeHtml(safeArticleUrl(item.link))}" target="_blank" rel="noopener noreferrer">View on OPSGROUP ↗</a></div>` : ""}
+            ${safeArticleUrl(item.link) ? `<div style="margin-top:8px"><a href="${escapeHtml(safeArticleUrl(item.link))}" target="_blank" rel="noopener noreferrer">Read more ↗</a></div>` : ""}
           </article>
         `;
       }).join("");
