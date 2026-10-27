@@ -820,7 +820,7 @@ function scrollToSection(sectionId) {
 
             ${item.type ? `<div class="type">${escapeHtml(item.type)}</div>` : ""}
 
-            <div class="content">${escapeHtml(item.content || "")}</div>
+            <div class="content">${linkifyContent(item.content || "")}</div>
           </article>
         `;
       }).join("");
@@ -840,6 +840,27 @@ function scrollToSection(sectionId) {
       const mi = String(d.getMinutes()).padStart(2, "0");
 
       return yyyy + "-" + mm + "-" + dd + " " + hh + ":" + mi;
+    }
+
+    function linkifyContent(value) {
+      const input = String(value || "");
+      const urlPattern = /https?:\/\/[^\s<>"']+/gi;
+      let result = "";
+      let cursor = 0;
+      let match;
+
+      while ((match = urlPattern.exec(input)) !== null) {
+        const candidate = match[0];
+        const url = candidate.replace(/[.,;!?)]+$/, "");
+        if (!url) continue;
+
+        result += escapeHtml(input.slice(cursor, match.index));
+        result += '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(url) + '</a>';
+        result += escapeHtml(candidate.slice(url.length));
+        cursor = match.index + candidate.length;
+      }
+
+      return result + escapeHtml(input.slice(cursor));
     }
 
     function escapeHtml(value) {
